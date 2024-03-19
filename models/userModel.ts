@@ -12,6 +12,8 @@ const userSchema = z.object({
   contact: z.string().length(10),
   password: z.string().min(8),
   address: z.string().min(5),
+  isAdmin: z.boolean().optional(),
+  isOpen: z.boolean().optional(),
 });
 
 const userMongooseSchema = new mongoose.Schema({
@@ -20,6 +22,8 @@ const userMongooseSchema = new mongoose.Schema({
   contact: { type: String, required: true, length: 10 },
   password: { type: String, required: true, minlength: 8 },
   address: { type: String, required: true, minlength: 5 },
+  isAdmin: { type: Boolean, default: false },
+  isOpen: { type: Boolean, default: true },
 });
 
 const UserModel = mongoose.model("User", userMongooseSchema);
