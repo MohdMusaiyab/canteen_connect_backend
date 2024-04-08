@@ -1,5 +1,5 @@
 import  Express  from "express";
-import { loginController, registerController } from "../controllers/auth";
+import { loginController, registerController,testController ,updateUserController} from "../controllers/auth";
 import { authenticateUser } from "../middlewares/isSign";
 const userRoutes = Express.Router();
 
@@ -8,6 +8,9 @@ userRoutes.get("/", (req, res) => {
 });
 userRoutes.post("/register-user",registerController);
 userRoutes.post("/login",loginController);
-// userRoutes.get("/me",authenticateUser,testController)
+// ========================Pending====================
+userRoutes.put("/update-user",authenticateUser,updateUserController)
+
+userRoutes.get("/me",authenticateUser,testController)
 export default userRoutes;
 
