@@ -1,8 +1,7 @@
 import { z } from "zod";
 import mongoose from "mongoose";
 
-// Define the Zod schema
-// ==================Modify the Schema======================
+
 const productSchema = z.object({
   name: z.string().min(2),
   description: z.string().min(5),
