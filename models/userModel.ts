@@ -2,7 +2,12 @@ import { z } from "zod";
 import mongoose from "mongoose";
 
 const userSchema = z.object({
-  name: z.string().min(2),
+  name: z
+    .string()
+    .min(2)
+    .refine((name) => name.length >= 2, {
+      message: "Name should be at least 2 letters",
+    }),
   email: z
     .string()
     .email()

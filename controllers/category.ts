@@ -7,18 +7,18 @@ export const createCategoryController = async (req: Request, res: Response) => {
     const checkBody = categorySchema.parse({ name, description });
     const newCategory = new CategoryModel(checkBody);
     await newCategory.save();
-    return res.status(201).json({
+    return res.status(201).send({
       message: "Category created successfully",
       success: true,
       data: newCategory,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({ error: error.errors });
+      return res.status(400).send({ message: error.errors, success: false });
     } else {
       return res
         .status(500)
-        .json({ error: "Internal Server Error", success: false });
+        .send({ message: "Internal Server Error", success: false });
     }
     console.log(error);
   }
@@ -31,7 +31,7 @@ export const updateCategoryController = async (req: Request, res: Response) => {
     if (!category) {
       return res
         .status(404)
-        .json({ message: "Category not found", success: false });
+        .send({ message: "Category not found", success: false });
     }
     if (name != undefined) {
       category.name = name;
@@ -40,7 +40,7 @@ export const updateCategoryController = async (req: Request, res: Response) => {
       category.description = description;
     }
     await category.save();
-    return res.status(200).json({
+    return res.status(200).send({
       success: true,
       message: "Category updated successfully",
       data: category,
@@ -76,4 +76,3 @@ export const deleteCategoryController = async (req: Request, res: Response) => {
       .json({ error: "Internal Server Error", success: false });
   }
 };
-
