@@ -4,7 +4,7 @@ import { OrderModel } from "../models/orderModel";
 // ================================This need to be checked==============================
 export const updateUserController = async (req: Request, res: Response) => {
   const userId = req.userId;
-  const {id} = req.params;
+  const { id } = req.params;
   if (id != userId) {
     return res.status(401).send({
       success: false,
@@ -36,7 +36,7 @@ export const updateUserController = async (req: Request, res: Response) => {
 
     return res
       .status(200)
-      .json({ message: "Profile updated successfully", user });
+      .send({ message: "Profile updated successfully", user, success: true });
   } catch (error) {
     console.log(error);
     return res.status(500).send({
@@ -85,7 +85,7 @@ export const getSingleUserOrdersController = async (
   try {
     const { id } = req.params;
     const userId = req.userId;
-   
+
     if (id !== userId) {
       return res.status(401).send({
         success: false,
@@ -100,7 +100,7 @@ export const getSingleUserOrdersController = async (
         message: "User not found",
       });
     }
-    const orders=await OrderModel.find({user:id});
+    const orders = await OrderModel.find({ user: id });
     return res.status(200).send({
       success: true,
       message: "User Orders Found",

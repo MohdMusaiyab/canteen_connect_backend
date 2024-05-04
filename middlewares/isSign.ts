@@ -21,14 +21,14 @@ export const authenticateUser = (
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
     // console.log("Decoded values",decoded);
     // Add the user data to the request object
-    const{_id}=decoded as {_id:string}
+    const { _id } = decoded as { _id: string };
     // console.log("User id",_id)
-    req.userId=_id;
+    req.userId = _id;
     // console.log("User id",req.userId)
     next();
   } catch (error) {
     // If token verification fails, return an error
-    return res.status(401).json({ message: "Invalid token" });
+    return res.status(401).send({ message: "Invalid token", success: false });
   }
 };
 
