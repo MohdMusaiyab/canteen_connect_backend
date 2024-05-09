@@ -13,7 +13,7 @@ export const authenticateUser = (
 
   if (!token) {
     // If there's no token, the user is not authenticated
-    return res.status(401).json({ message: "Not authenticated" });
+    return res.status(401).send({ message: "Not authenticated" ,success:false});
   }
 
   try {
