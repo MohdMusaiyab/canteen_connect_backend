@@ -13,7 +13,7 @@ export const isAdmin = async (
     next();
     return;
   }
-  return res.status(401).json({
+  return res.status(401).send({
     success: false,
     message: "Unauthorised Access ! Admins Only",
   });
