@@ -20,7 +20,7 @@ export const registerController = async (req: Request, res: Response) => {
     const user = await UserModel.create(userData);
     return res
       .status(201)
-      .send({ success: true, message: "User Created Successfully", user });
+      .send({ success: true, message: "User Created Successfully" });
   } catch (error) {
     // console.log(error);
     if (error instanceof z.ZodError) {
@@ -52,7 +52,10 @@ export const loginController = async (req: Request, res: Response) => {
         .send({ message: "Invalid email or password", success: false });
     }
     const token = generateToken(user._id.toString());
-    return res.status(200).send({ success: true, token });
+    const { password: _, ...userWithoutPassword } = user;
+    return res
+      .status(200)
+      .send({ success: true, user: userWithoutPassword, token });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res
