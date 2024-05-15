@@ -11,6 +11,7 @@ const productSchema = z.object({
   vendor: z.string().refine((data) => mongoose.Types.ObjectId.isValid(data)),
   photo: z.string().optional(),
   quantity: z.number().min(0),
+  isAvailable: z.boolean().optional(),
 });
 
 // Define the Mongoose schema
@@ -28,6 +29,7 @@ const productMongooseSchema = new mongoose.Schema(
     photo: { type: String, required: false },
     cookingTime: { type: Number, required: true, min: 0 },
     quantity: { type: Number, required: true, min: 0 },
+    isAvailable: { type: Boolean, default: true },
   },
   { timestamps: true }
 );
