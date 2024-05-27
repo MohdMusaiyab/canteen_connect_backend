@@ -3,13 +3,14 @@ import { categorySchema, CategoryModel } from "../models/categoryModel";
 import { z } from "zod";
 export const createCategoryController = async (req: Request, res: Response) => {
   const { name, description } = req.body;
+  const { id } = req.params;
   try {
-    const checkBody = categorySchema.parse({ name, description });
-    const newCategory = new CategoryModel(checkBody);
+    const category = categorySchema.parse({ name, description, vendor: id });
+    const newCategory = new CategoryModel(category);
     await newCategory.save();
     return res.status(201).send({
-      message: "Category created successfully",
       success: true,
+      message: "Category created successfully",
       data: newCategory,
     });
   } catch (error) {
@@ -74,5 +75,30 @@ export const deleteCategoryController = async (req: Request, res: Response) => {
     return res
       .status(500)
       .json({ error: "Internal Server Error", success: false });
+  }
+};
+
+export const getVendorCategoriesController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { id } = req.params;
+    const categories = await CategoryModel.find({ vendor: id });
+    if (!categories) {
+      return res
+        .status(404)
+        .send({ message: "Categories not found", success: false });
+    }
+    return res.status(200).send({
+      success: true,
+      message: "Categories fetched successfully",
+      data: categories,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .send({ message: "Internal Server Error", success: false });
   }
 };

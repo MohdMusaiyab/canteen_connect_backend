@@ -7,28 +7,33 @@ export const authenticateUser = (
   next: NextFunction
 ) => {
   // Get the token from the Authorization header
-  const token = req.headers.authorization;
-  // const token = authHeader && authHeader.split(' ')[1];
-  // console.log(token)
+  const authHeader = req.headers.authorization;
 
-  if (!token) {
-    // If there's no token, the user is not authenticated
-    return res.status(401).send({ message: "Not authenticated" ,success:false});
+  if (!authHeader) {
+    // If there's no token, return an error response
+    return res
+      .status(401)
+      .json({ message: "Not authenticated", success: false });
   }
+  console.log(authHeader);
+
+  // Extract the token and verify format
+  const token = authHeader.split(" ")[1]; // Assuming "Bearer <token>"
 
   try {
     // Verify the token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
-    // console.log("Decoded values",decoded);
-    // Add the user data to the request object
-    const { _id } = decoded as { _id: string };
-    // console.log("User id",_id)
-    req.userId = _id;
-    // console.log("User id",req.userId)
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
+      _id: string;
+    };
+
+    // Add the user id to the request object
+    req.userId = decoded._id;
+
+    // Proceed to the next middleware or route handler
     next();
   } catch (error) {
-    // If token verification fails, return an error
-    return res.status(401).send({ message: "Invalid token", success: false });
+    // If token verification fails, return an error response
+    return res.status(401).json({ message: "Invalid token", success: false });
   }
 };
 

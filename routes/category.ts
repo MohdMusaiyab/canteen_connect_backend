@@ -3,6 +3,7 @@ import {
   createCategoryController,
   updateCategoryController,
   deleteCategoryController,
+  getVendorCategoriesController,
 } from "../controllers/category";
 import { isAdmin } from "../middlewares/isAdmin";
 import authenticateUser from "../middlewares/isSign";
@@ -13,12 +14,12 @@ categoryRoutes.get("/", (req, res) => {
   res.send("Hello from Category router");
 });
 categoryRoutes.post(
-  "/create-category",
+  "/create-category/:id",
   authenticateUser,
   isAdmin,
   createCategoryController
 );
-
+// =====Check Update Category Controller================
 categoryRoutes.put(
   "/update-category/:id",
   authenticateUser,
@@ -30,5 +31,11 @@ categoryRoutes.delete(
   authenticateUser,
   isAdmin,
   deleteCategoryController
+);
+
+categoryRoutes.get(
+  "/get-vendor-categories/:id",
+  authenticateUser,
+  getVendorCategoriesController
 );
 export default categoryRoutes;
