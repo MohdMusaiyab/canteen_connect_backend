@@ -139,7 +139,7 @@ export const getAllProductsController = async (req: Request, res: Response) => {
     //Vendor id for knowing the Vendor whose products we need to get
     const { id } = req.params;
     // Need Checking
-    const products = await ProductModel.findOne({
+    const products = await ProductModel.find({
       vendor: id,
     });
     if (!products) {
