@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { CartModel } from "../models/cartModel";
 import { findProduct } from "../utils/findProduct";
+import mongoose from "mongoose";
 
 // =============================For Adding the Product to the Cart=============================
 
@@ -12,6 +13,9 @@ export const addProductController = async (req: Request, res: Response) => {
       return res.status(400).send({ error: "Bad Request", success: false });
     }
     console.log(id, userId);
+    if (mongoose.Types.ObjectId.isValid(id) === false) {
+      return res.status(400).send({ error: "Invalid User Id", success: false });
+    }
     if (id !== userId) {
       return res.status(401).send({ error: "Unauthorized", success: false });
     }

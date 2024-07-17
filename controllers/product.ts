@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { productSchema, ProductModel } from "../models/productModel";
 import { z } from "zod";
+import mongoose from "mongoose";
 // ===================Check the code below======================
-// Create is working fine
 export const createProductController = async (req: Request, res: Response) => {
   try {
     const { name, description, price, category, cookingTime, photo, quantity } =
@@ -135,27 +135,27 @@ export const deleteProductController = async (req: Request, res: Response) => {
 // ==============Gettingg All the Products=============
 export const getAllProductsController = async (req: Request, res: Response) => {
   try {
-    // We need to get all the Products for both users and Admin
-    //Vendor id for knowing the Vendor whose products we need to get
     const { id } = req.params;
-    // Need Checking
-    const products = await ProductModel.find({
-      vendor: id,
-    });
-    if (!products) {
-      // Check the stats code
-      return res.status(404).send({
-        success: false,
-        message: "No products Found",
-      });
+
+    if (!id) {
+      return res.status(400).send({ message: "Vendor ID is required", success: false });
     }
-    return res.status(200).send({
-      success: true,
-      message: "Products Found",
-      products,
-    });
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).send({ message: "Invalid Vendor ID format", success: false });
+    }
+
+    const products = await ProductModel.find({ vendor: id });
+
+    // Check if products array is not found or empty
+    if (!products || products.length === 0) {
+      return res.status(404).send({ success: false, message: "No products Found" });
+    }
+
+    return res.status(200).send({ success: true, message: "Products Found", products });
   } catch (error) {
-    console.log(error);
+    console.error(error); // Changed to console.error for better error logging
+    return res.status(500).send({ message: "An error occurred", success: false });
   }
 };
 // =========================================Chechk it====================================
@@ -167,6 +167,19 @@ export const getSingleProductController = async (
   try {
     const { id } = req.params;
     // Case where id is not found
+    if (!id) {
+      return res.status(400).send({
+        success: false,
+        message: "Product ID is required",
+      });
+    }
+    // Case where id is not valid
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).send({
+        success: false,
+        message: "Invalid Product ID format",
+      });
+    }
     const product = await ProductModel.findById(id);
     if (!product) {
       return res.status(404).send({
