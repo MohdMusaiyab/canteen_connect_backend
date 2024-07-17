@@ -23,6 +23,8 @@ const cartMongooseSchema = new mongoose.Schema(
           required: true,
         },
         quantity: { type: Number, required: true, min: 1 },
+        //Just Added Cost in Here for better
+        // cost : { type: Number, required: true, min: 0 },
       },
     ],
     total: { type: Number, required: true, min: 0 },

@@ -30,6 +30,7 @@ export const authenticateUser = (
     req.userId = decoded._id;
 
     // Proceed to the next middleware or route handler
+    console.log("Called the next ")
     next();
   } catch (error) {
     // If token verification fails, return an error response
