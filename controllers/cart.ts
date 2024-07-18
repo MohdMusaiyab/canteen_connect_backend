@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { CartModel } from "../models/cartModel";
 import { findProduct } from "../utils/findProduct";
+import mongoose from "mongoose";
 
 // =============================For Adding the Product to the Cart=============================
 
@@ -12,6 +13,9 @@ export const addProductController = async (req: Request, res: Response) => {
       return res.status(400).send({ error: "Bad Request", success: false });
     }
     console.log(id, userId);
+    if (mongoose.Types.ObjectId.isValid(id) === false) {
+      return res.status(400).send({ error: "Invalid User Id", success: false });
+    }
     if (id !== userId) {
       return res.status(401).send({ error: "Unauthorized", success: false });
     }
@@ -62,9 +66,69 @@ export const addProductController = async (req: Request, res: Response) => {
   }
 };
 // ===============================For Deleting the Product from the Cart================================
-export const deleteProductController = (req: Request, res: Response) => {
+export const removeProductController = async (req: Request, res: Response) => {
   try {
-    return res.send("Hello from Delete Product Controller");
+    const { id, productId } = req.body;
+    const userId = req.userId;
+
+    if (!id || !productId) {
+      return res.status(400).send({ error: "Bad Request", success: false });
+    }
+
+    if (mongoose.Types.ObjectId.isValid(id) === false) {
+      return res.status(400).send({ error: "Invalid User Id", success: false });
+    }
+
+    if (id !== userId) {
+      return res.status(401).send({ error: "Unauthorized", success: false });
+    }
+
+    if (!id || !productId || !/^[0-9a-fA-F]{24}$/.test(productId)) {
+      return res
+        .status(400)
+        .send({ error: "Invalid productId", success: false });
+    }
+
+    const result = await findProduct(productId);
+    if (!result.success) {
+      return res.status(404).send({ message: result.message, success: false });
+    }
+
+    let cart = await CartModel.findOne({ user: id });
+    if (!cart) {
+      return res
+        .status(404)
+        .send({ success: false, message: "No cart found for the user" });
+    }
+
+    const productIndex = cart.products.findIndex(
+      (item) => item.product.toString() === productId
+    );
+
+    if (productIndex === -1) {
+      return res
+        .status(404)
+        .send({ success: false, message: "Product not found in the cart" });
+    }
+
+    const price = result.price ?? 0;
+    const productQuantity = cart.products[productIndex].quantity;
+
+    if (productQuantity > 1) {
+      cart.products[productIndex].quantity--;
+      cart.total -= price;
+    } else {
+      cart.products.splice(productIndex, 1);
+      cart.total -= price;
+    }
+
+    await cart.save();
+
+    return res.send({
+      cart,
+      success: true,
+      message: "Product removed from the Cart",
+    });
   } catch (error) {
     console.log(error);
     return res
@@ -73,9 +137,46 @@ export const deleteProductController = (req: Request, res: Response) => {
   }
 };
 
-// =============================For Gettingthe Cart================================
-export const getUserCartController = (req: Request, res: Response) => {
+// =============================For Getting the Cart of a Single User================================
+
+export const getUserCartController = async (req: Request, res: Response) => {
   try {
+    const { id } = req.params;
+    const userId = req.userId;
+
+    if (!id || !userId) {
+      return res
+        .status(400)
+        .send({ error: "User ID is required", success: false });
+    }
+
+    if (mongoose.Types.ObjectId.isValid(id) === false) {
+      return res
+        .status(400)
+        .send({ error: "Invalid User Id format", success: false });
+    }
+
+    if (id !== userId) {
+      return res
+        .status(401)
+        .send({ error: "Unauthorized access", success: false });
+    }
+
+    const cart = await CartModel.findOne({ user: id }).populate(
+      "products.product"
+    );
+
+    if (!cart) {
+      return res
+        .status(404)
+        .send({ success: false, message: "Cart not found" });
+    }
+
+    return res.send({
+      cart,
+      success: true,
+      message: "Cart retrieved successfully",
+    });
   } catch (error) {
     console.log(error);
     return res
@@ -84,6 +185,4 @@ export const getUserCartController = (req: Request, res: Response) => {
   }
 };
 
-// ==============================Increasing the Quantity of the Product in the Cart==============================
 
-// ========================== Decrementing the Quantity of the Product in the Cart==================
