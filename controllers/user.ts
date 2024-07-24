@@ -114,3 +114,26 @@ export const getSingleUserOrdersController = async (
     });
   }
 };
+
+export const getAllVendorsController = async (req: Request, res: Response) => {
+  try {
+    const vendors = await UserModel.find({ isAdmin: true });
+    if (!vendors) {
+      return res.status(404).send({
+        success: false,
+        message: "Vendors not found",
+      });
+    }
+    return res.status(200).send({
+      success: true,
+      message: "All Vendors Found",
+      data: vendors,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};

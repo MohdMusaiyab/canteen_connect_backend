@@ -9,6 +9,7 @@ import { authenticateUser } from "../middlewares/isSign";
 import {
   getSingleUserController,
   getSingleUserOrdersController,
+  getAllVendorsController
 } from "../controllers/user";
 const userRoutes = Express.Router();
 
@@ -471,6 +472,71 @@ userRoutes.get(
   authenticateUser,
   getSingleUserOrdersController
 );
+// ================Documentation Needed================
+
+
+/**
+ * @swagger
+ * /users/get-all-vendors:
+ *   get:
+ *     summary: Get all vendors
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved all vendors
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       name:
+ *                         type: string
+ *                       email:
+ *                         type: string
+ *                       contact:
+ *                         type: string
+ *                       address:
+ *                         type: string
+ *                       isAdmin:
+ *                         type: boolean
+ *                       isOpen:
+ *                         type: boolean
+ *                       profilePic:
+ *                         type: string
+ *       404:
+ *         description: Vendors not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ */
+userRoutes.get("/get-all-vendors", getAllVendorsController);
+
 userRoutes.get("/me", authenticateUser, testController);
 
 export default userRoutes;
