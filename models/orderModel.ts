@@ -6,7 +6,14 @@ import mongoose from "mongoose";
 const orderSchema = z.object({
   user: z.string().refine((data) => mongoose.Types.ObjectId.isValid(data)),
   vendor: z.string().refine((data) => mongoose.Types.ObjectId.isValid(data)),
-  status: z.enum(["pending", "processing", "delivered", "cancelled"]),
+  status: z.enum([
+    "pending",
+    "accepted",
+    "payment-awaited",
+    "processing",
+    "delivered",
+    "cancelled",
+  ]),
 
   total: z.number().min(0),
 
@@ -26,7 +33,14 @@ const orderMongooseSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "processing", "delivered", "cancelled"],
+      enum: [
+        "pending",
+        "accepted",
+        "payment-awaited",
+        "processing",
+        "delivered",
+        "cancelled",
+      ],
       default: "pending",
     },
 
