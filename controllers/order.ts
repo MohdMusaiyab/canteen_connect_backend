@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import { findUser } from "../utils/userUtils";
 import { CartModel } from "../models/cartModel";
 import { UserModel } from "../models/userModel";
+import {io} from "../socket";
 export const createOrderController = async (req: Request, res: Response) => {
   try {
     //Get the user, vendor, total and cart from the request body
@@ -55,6 +56,13 @@ export const createOrderController = async (req: Request, res: Response) => {
     });
     await order.save();
     //Now when the order is created
+    //We will emit an event to the vendor
+    io.to(vendor).emit("order_received", {
+      vendor,
+      orderId: order._id,
+      userId,
+      otp,
+    });
     res.status(201).send({ message: "Order created", success: true, otp });
   } catch (error) {
     console.log(error);
