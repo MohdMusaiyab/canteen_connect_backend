@@ -4,7 +4,8 @@ import mongoose from "mongoose";
 import { findUser } from "../utils/userUtils";
 import { CartModel } from "../models/cartModel";
 import { UserModel } from "../models/userModel";
-import {io} from "../socket";
+import { io } from "../socket";
+import { userSocketMap } from "../socket";
 export const createOrderController = async (req: Request, res: Response) => {
   try {
     //Get the user, vendor, total and cart from the request body
@@ -55,14 +56,18 @@ export const createOrderController = async (req: Request, res: Response) => {
       cart,
     });
     await order.save();
-    //Now when the order is created
-    //We will emit an event to the vendor
-    io.to(vendor).emit("order_received", {
-      vendor,
-      orderId: order._id,
-      userId,
-      otp,
-    });
+    //Now we will emit the event to the vendor according to the socket ID
+    const vendorId = vendor.toString();
+    const socketIds = userSocketMap.get(vendorId); // Get all socket IDs for the vendor
+    if (socketIds && socketIds.size > 0) {
+      socketIds.forEach((socketId) => {
+        io.to(socketId).emit("new_order", order); // Emit the 'new_order' event to each socket ID
+        console.log(`Order sent to vendor with user ID ${vendorId} and socket ID ${socketId}`);
+      });
+    } else {
+      console.log(`Vendor with user ID ${vendorId} is not connected.`);
+    }
+
     res.status(201).send({ message: "Order created", success: true, otp });
   } catch (error) {
     console.log(error);

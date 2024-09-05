@@ -8,21 +8,18 @@ import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerOptions from "./swagger";
 import http from "http";
-import { initSocket } from "./socket";
+import { initSocketServer } from "./socket";
 
 // Initialize environment variables
 dotenv.config();
 
 const app = express();
 
-// Create HTTP server from Express app
-const server = http.createServer(app);
-
-// Initialize Socket.IO server and attach to HTTP server
-initSocket(server); // Ensure this initializes properly
-
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
+const server = http.createServer(app);
+
+const io = initSocketServer(server);
 // Middleware setup
 app.use(express.json());
 app.use(morgan("dev"));
@@ -35,6 +32,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/v1", rootRoutes);
 
 // Start the HTTP server (ensure it's `server.listen`, not `app.listen`)
+
 server.listen(3000, () => {
   console.log("Server is running on port 3000");
 });
