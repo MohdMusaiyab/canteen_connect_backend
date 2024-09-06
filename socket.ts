@@ -1,5 +1,6 @@
 import { Server as HttpServer } from "http";
 import { Server, Socket } from "socket.io";
+import { OrderModel } from "./models/orderModel";
 
 export const userSocketMap = new Map<string, Set<string>>(); // Map of userId -> Set of socketIds
 
@@ -43,8 +44,33 @@ export const initSocketServer = (httpServer: HttpServer) => {
         }
       }
     });
-
-    // You can add more custom events here if needed, like message handling, notifications, etc.
+    //
+    socket.on("accept_order", async (orderId: string) => {
+      //Update the order status in the database
+      console.log(orderId);
+      const updateOrder = await OrderModel.findByIdAndUpdate(
+        orderId,
+        { status: "payment-awaited" },
+        { new: true }
+      );
+      if (updateOrder) {
+        console.log("Order Updated");
+        //Emit the event to the user and vendor
+        const userSocketIds = userSocketMap.get(updateOrder.user.toString());
+        if (userSocketIds) {
+          userSocketIds.forEach((socketId) => {
+            io.to(socketId).emit("order_updated", updateOrder);
+          });
+        }
+        const vendorSocketIds = userSocketMap.get(updateOrder.vendor.toString());
+        if (vendorSocketIds) {
+          vendorSocketIds.forEach((socketId) => {
+            io.to(socketId).emit("order_updated", updateOrder);
+          });
+        }
+        
+      }
+    });
   });
 
   return io;

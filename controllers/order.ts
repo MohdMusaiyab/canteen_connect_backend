@@ -68,7 +68,7 @@ export const createOrderController = async (req: Request, res: Response) => {
       console.log(`Vendor with user ID ${vendorId} is not connected.`);
     }
 
-    res.status(201).send({ message: "Order created", success: true, otp });
+    return res.status(201).send({ message: "Order created", success: true, otp });
   } catch (error) {
     console.log(error);
     res.status(500).send({ message: "Internal server error", success: false });
