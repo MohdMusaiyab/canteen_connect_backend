@@ -59,16 +59,52 @@ export const initSocketServer = (httpServer: HttpServer) => {
         const userSocketIds = userSocketMap.get(updateOrder.user.toString());
         if (userSocketIds) {
           userSocketIds.forEach((socketId) => {
-            io.to(socketId).emit("order_updated", updateOrder);
+            io.to(socketId).emit("initiate_payment", {
+              orderId: updateOrder._id,
+              amount: updateOrder.total,
+              currency: "INR",
+            });
           });
         }
-        const vendorSocketIds = userSocketMap.get(updateOrder.vendor.toString());
+        const vendorSocketIds = userSocketMap.get(
+          updateOrder.vendor.toString()
+        );
         if (vendorSocketIds) {
           vendorSocketIds.forEach((socketId) => {
             io.to(socketId).emit("order_updated", updateOrder);
           });
         }
-        
+      }
+    });
+    socket.on("payment_confirmed", async (data: { orderId: string }) => {
+      const { orderId } = data;
+      const updateOrder = await OrderModel.findByIdAndUpdate(
+        orderId,
+        { status: "processing" },
+        { new: true }
+      );
+      if (updateOrder) {
+        console.log("Payment for Order Confirmed", orderId);
+        //Notify the user about payment confirmation
+        const userSocketIds = userSocketMap.get(updateOrder.user.toString());
+        if (userSocketIds) {
+          userSocketIds.forEach((socketId) => {
+            io.to(socketId).emit("payment_status_updated", {
+              orderId: updateOrder._id,
+              status: "Payment Confirmed",
+            });
+          });
+        }
+
+        //Notify the vendor about payment confirmation
+        const vendorSocketIds = userSocketMap.get(
+          updateOrder.vendor.toString()
+        );
+        if (vendorSocketIds) {
+          vendorSocketIds.forEach((socketId) => {
+            io.to(socketId).emit("order_confirmed", updateOrder);
+          });
+        }
       }
     });
   });
