@@ -81,7 +81,7 @@ cartRoutes.get("/", (req, res) => {
  *                 success:
  *                   type: boolean
  *                   example: false
- *                 error:
+ *                 message:
  *                   type: string
  *                   example: Bad Request
  *       401:
@@ -94,7 +94,7 @@ cartRoutes.get("/", (req, res) => {
  *                 success:
  *                   type: boolean
  *                   example: false
- *                 error:
+ *                 message:
  *                   type: string
  *                   example: Unauthorized
  *       404:
@@ -120,7 +120,7 @@ cartRoutes.get("/", (req, res) => {
  *                 success:
  *                   type: boolean
  *                   example: false
- *                 error:
+ *                 message:
  *                   type: string
  *                   example: Internal Server Error
  */
@@ -194,7 +194,7 @@ cartRoutes.post("/add-product", authenticateUser, addProductController);
  *                 success:
  *                   type: boolean
  *                   example: false
- *                 error:
+ *                 message:
  *                   type: string
  *                   example: Bad Request
  *       401:
@@ -207,7 +207,7 @@ cartRoutes.post("/add-product", authenticateUser, addProductController);
  *                 success:
  *                   type: boolean
  *                   example: false
- *                 error:
+ *                 message:
  *                   type: string
  *                   example: Unauthorized
  *       404:
@@ -233,7 +233,7 @@ cartRoutes.post("/add-product", authenticateUser, addProductController);
  *                 success:
  *                   type: boolean
  *                   example: false
- *                 error:
+ *                 message:
  *                   type: string
  *                   example: Internal Server Error
  * */
@@ -301,7 +301,7 @@ cartRoutes.delete("/remove-product", authenticateUser, removeProductController);
  *                 success:
  *                   type: boolean
  *                   example: false
- *                 error:
+ *                 message:
  *                   type: string
  *                   example: "User ID is required or Invalid User Id format"
  *       401:
@@ -314,7 +314,7 @@ cartRoutes.delete("/remove-product", authenticateUser, removeProductController);
  *                 success:
  *                   type: boolean
  *                   example: false
- *                 error:
+ *                 message:
  *                   type: string
  *                   example: Unauthorized access
  *       404:
@@ -340,7 +340,7 @@ cartRoutes.delete("/remove-product", authenticateUser, removeProductController);
  *                 success:
  *                   type: boolean
  *                   example: false
- *                 error:
+ *                 message:
  *                   type: string
  *                   example: Internal Server Error
  */

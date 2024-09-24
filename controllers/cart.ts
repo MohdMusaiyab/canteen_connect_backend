@@ -76,7 +76,7 @@ export const addProductController = async (req: Request, res: Response) => {
     console.log(error);
     return res
       .status(500)
-      .send({ error: "Internal Server Error", success: false });
+      .send({ message: "Internal Server Error", success: false });
   }
 };
 
@@ -87,21 +87,21 @@ export const removeProductController = async (req: Request, res: Response) => {
     const userId = req.userId;
 
     if (!id || !productId) {
-      return res.status(400).send({ error: "Bad Request", success: false });
+      return res.status(400).send({ message: "Bad Request", success: false });
     }
 
     if (mongoose.Types.ObjectId.isValid(id) === false) {
-      return res.status(400).send({ error: "Invalid User Id", success: false });
+      return res.status(400).send({ message: "Invalid User Id", success: false });
     }
 
     if (id !== userId) {
-      return res.status(401).send({ error: "Unauthorized", success: false });
+      return res.status(401).send({ message: "Unauthorized", success: false });
     }
 
     if (!id || !productId || !/^[0-9a-fA-F]{24}$/.test(productId)) {
       return res
         .status(400)
-        .send({ error: "Invalid productId", success: false });
+        .send({ message: "Invalid productId", success: false });
     }
 
     const result = await findProduct(productId);
@@ -148,7 +148,7 @@ export const removeProductController = async (req: Request, res: Response) => {
     console.log(error);
     return res
       .status(500)
-      .send({ error: "Internal Server Error", success: false });
+      .send({ message: "Internal Server Error", success: false });
   }
 };
 
