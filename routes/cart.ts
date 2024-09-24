@@ -34,6 +34,9 @@ cartRoutes.get("/", (req, res) => {
  *               productId:
  *                 type: string
  *                 example: "60c72b2f9b1e8e001c8e4ad8"
+ *               quantity:
+ *                 type: number
+ *                 example: 1
  *     responses:
  *       200:
  *         description: Product added to the cart
