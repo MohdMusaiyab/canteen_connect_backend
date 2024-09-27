@@ -13,9 +13,9 @@ export const authenticateUser = (
     // If there's no token, return an error response
     return res
       .status(401)
-      .json({ message: "Not authenticated", success: false });
+      .send({ message: "Not authenticated", success: false });
   }
-  console.log(authHeader);
+  // console.log(authHeader);
 
   // Extract the token and verify format
   const token = authHeader.split(" ")[1]; // Assuming "Bearer <token>"
