@@ -11,7 +11,7 @@ export const initSocketServer = (httpServer: HttpServer) => {
   // Initialize Socket.IO server
   io = new Server(httpServer, {
     cors: {
-      origin: "http://localhost:5173/", // Replace with your client URL
+      origin: "http://localhost:5173/",
       methods: ["GET", "POST"],
     },
   });
@@ -76,6 +76,46 @@ export const initSocketServer = (httpServer: HttpServer) => {
         }
       }
     });
+    //Trying here so that We can remove the order
+    socket.on("decline_order", async (orderId: string) => {
+      try {
+        // Update the order status to "cancelled"
+        const updateOrder = await OrderModel.findByIdAndUpdate(
+          orderId,
+          { status: "cancelled" },
+          { new: true }
+        );
+    
+        if (updateOrder) {
+          console.log("Order Declined");
+    
+          // Notify the user about the cancelled order
+          const userSocketIds = userSocketMap.get(updateOrder.user.toString());
+          if (userSocketIds) {
+            userSocketIds.forEach((socketId) => {
+              io.to(socketId).emit("order_cancelled", {
+                orderId: updateOrder._id,
+                status: "cancelled",
+              }); 
+            });
+          }
+    
+          // Notify the vendor about the cancelled order
+          const vendorSocketIds = userSocketMap.get(updateOrder.vendor.toString());
+          if (vendorSocketIds) {
+            vendorSocketIds.forEach((socketId) => {
+              io.to(socketId).emit("order_cancelled", updateOrder);
+            });
+          }
+        } else {
+          console.error("Order not found or could not be updated");
+        }
+      } catch (error) {
+        console.error("Error declining the order:", error);
+      }
+    });
+    
+
     socket.on("payment_confirmed", async (data: { orderId: string }) => {
       const { orderId } = data;
       const updateOrder = await OrderModel.findByIdAndUpdate(
