@@ -107,6 +107,33 @@ export const initSocketServer = (httpServer: HttpServer) => {
         }
       }
     });
+    //Now for Cancelling the order
+    socket.on("cancell_order", async (orderId: string) => {
+      const updateOrder = await OrderModel.findByIdAndUpdate(
+        orderId,
+        { status: "cancelled" },
+        { new: true } // To return the updated document
+      );
+
+      if (updateOrder) {
+        console.log("Order Cancelled");
+        //Emit the event to the user and vendor
+        const userSocketIds = userSocketMap.get(updateOrder.user.toString());
+        if (userSocketIds) {
+          userSocketIds.forEach((socketId) => {
+            io.to(socketId).emit("order_cancelled", updateOrder);
+          });
+        }
+        const vendorSocketIds = userSocketMap.get(
+          updateOrder.vendor.toString()
+        );
+        if (vendorSocketIds) {
+          vendorSocketIds.forEach((socketId) => {
+            io.to(socketId).emit("order_cancelled", updateOrder);
+          });
+        }
+      }
+    });
   });
 
   return io;
